@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "bannerboats.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractBoatEntityMixin",
+    "VehicleEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

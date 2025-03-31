@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "bannerboats.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "AbstractBoatEntityRendererMixin",
+    "BoatEntityRenderStateMixin",
+    "ExampleClientMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

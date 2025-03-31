@@ -1,0 +1,12 @@
+{
+  "bannerboats.entity.boat.add_item": {
+    "category": "players",
+    "subtitle": "bannerboats.subtitles.boat_add_item",
+    "sounds": [
+      "minecraft:entity/itemframe/add_item1",
+      "minecraft:entity/itemframe/add_item2",
+      "minecraft:entity/itemframe/add_item3",
+      "minecraft:entity/itemframe/add_item4"
+    ]
+  }
+}
