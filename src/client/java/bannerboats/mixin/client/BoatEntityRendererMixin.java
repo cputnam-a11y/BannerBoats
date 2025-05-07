@@ -3,6 +3,7 @@ package bannerboats.mixin.client;
 import bannerboats.attachment.ModAttachments;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.AbstractBannerBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BannerBlockEntity;
@@ -15,6 +16,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
+import org.objectweb.asm.Type;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,7 +43,15 @@ public class BoatEntityRendererMixin {
 
     static {
         try {
-            POS = BlockEntity.class.getDeclaredField("pos");
+            var className = BlockEntity.class.getName();
+            var mapper = FabricLoader.getInstance().getMappingResolver();
+            var fieldName = mapper.mapFieldName(
+                    "intermediary",
+                    className,
+                    "field_11867",
+                    Type.getDescriptor(BlockPos.class)
+            );
+            POS = BlockEntity.class.getDeclaredField(fieldName);
             POS.setAccessible(true);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
