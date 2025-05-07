@@ -4,7 +4,7 @@ import bannerboats.BannerBoats;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.VehicleEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -26,25 +26,25 @@ public class ModAttachments {
     public static void init() {
     }
 
-    public static boolean hasBanner(AbstractBoatEntity boat) {
+    public static boolean hasBanner(BoatEntity boat) {
         return boat.hasAttached(BOAT_BANNER);
     }
 
     public static Optional<ItemStack> getBanner(VehicleEntity vehicle) {
-        return vehicle instanceof AbstractBoatEntity boat
+        return vehicle instanceof BoatEntity boat
                ? getBanner(boat)
                : Optional.empty();
     }
 
-    public static Optional<ItemStack> getBanner(AbstractBoatEntity boat) {
+    public static Optional<ItemStack> getBanner(BoatEntity boat) {
         return Optional.ofNullable(boat.getAttached(BOAT_BANNER));
     }
 
-    public static void setBanner(AbstractBoatEntity boat, ItemStack banner) {
+    public static void setBanner(BoatEntity boat, ItemStack banner) {
         boat.setAttached(BOAT_BANNER, banner);
     }
 
-    public static void removeBanner(AbstractBoatEntity boat) {
+    public static void removeBanner(BoatEntity boat) {
         boat.removeAttached(BOAT_BANNER);
     }
 }

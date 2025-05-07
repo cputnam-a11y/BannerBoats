@@ -5,7 +5,7 @@ import bannerboats.sound.ModSoundEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.sound.SoundCategory;
@@ -20,7 +20,7 @@ public class UseBoatHandler implements UseEntityCallback {
     @Override
     @SuppressWarnings("UnnecessaryDefault")
     public ActionResult interact(PlayerEntity player, World world, Hand hand, Entity entity, @Nullable EntityHitResult hitResult) {
-        if (!(entity instanceof AbstractBoatEntity boat))
+        if (!(entity instanceof BoatEntity boat))
             return ActionResult.PASS;
         if (ModAttachments.hasBanner(boat))
             return ActionResult.PASS;

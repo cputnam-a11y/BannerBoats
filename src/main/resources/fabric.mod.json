@@ -3,15 +3,14 @@
 	"id": "bannerboats",
 	"version": "${version}",
 	"name": "BannerBoats",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "It adds banners to boats. What did you expect?",
 	"authors": [
-		"Me!"
+		"cputnam-a11y"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/cputnam-a11y/BannerBoats"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/bannerboats/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -30,12 +29,9 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": "~1.21.4",
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.1",
 		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
