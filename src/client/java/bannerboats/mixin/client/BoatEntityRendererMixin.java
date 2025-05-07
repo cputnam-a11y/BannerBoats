@@ -43,11 +43,10 @@ public class BoatEntityRendererMixin {
 
     static {
         try {
-            var className = BlockEntity.class.getName();
             var mapper = FabricLoader.getInstance().getMappingResolver();
             var fieldName = mapper.mapFieldName(
                     "intermediary",
-                    className,
+                    "net.minecraft.class_2586",
                     "field_11867",
                     Type.getDescriptor(BlockPos.class)
             );
