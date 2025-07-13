@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "AbstractBoatEntityRendererMixin",
-    "BoatEntityRenderStateMixin",
-    "ExampleClientMixin"
+    "BoatEntityRenderStateMixin"
   ],
   "injectors": {
     "defaultRequire": 1
