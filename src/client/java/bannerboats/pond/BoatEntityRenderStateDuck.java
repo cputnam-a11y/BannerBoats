@@ -1,14 +1,14 @@
 package bannerboats.pond;
 
-import net.minecraft.component.type.BannerPatternsComponent;
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
 
 public interface BoatEntityRenderStateDuck {
     DyeColor bannerBoats$bannerColor();
 
-    BannerPatternsComponent bannerBoats$patterns();
+    BannerPatternLayers bannerBoats$patterns();
 
     void bannerBoats$setBannerColor(DyeColor color);
 
-    void bannerBoats$setPatterns(BannerPatternsComponent patterns);
+    void bannerBoats$setPatterns(BannerPatternLayers patterns);
 }

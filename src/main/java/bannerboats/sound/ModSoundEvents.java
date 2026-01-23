@@ -1,24 +1,25 @@
 package bannerboats.sound;
 
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import org.jetbrains.annotations.NotNull;
 
 import static bannerboats.BannerBoats.MOD_ID;
 
 public class ModSoundEvents {
-    public static final RegistryEntry<SoundEvent> ENTITY_BOAT_ADD_ITEM = register(
+    public static final Holder<@NotNull SoundEvent> ENTITY_BOAT_ADD_ITEM = register(
             "bannerboats.entity.boat.add_item"
     );
 
-    public static RegistryEntry<SoundEvent> register(String name) {
-        var id = Identifier.of(MOD_ID, name);
-        return Registry.registerReference(
-                Registries.SOUND_EVENT,
+    public static Holder<@NotNull SoundEvent> register(String name) {
+        var id = Identifier.fromNamespaceAndPath(MOD_ID, name);
+        return Registry.registerForHolder(
+                BuiltInRegistries.SOUND_EVENT,
                 id,
-                SoundEvent.of(id)
+                SoundEvent.createVariableRangeEvent(id)
         );
     }
 

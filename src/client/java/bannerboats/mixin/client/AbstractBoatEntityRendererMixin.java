@@ -4,20 +4,22 @@ import bannerboats.attachment.ModAttachments;
 import bannerboats.pond.BoatEntityRenderStateDuck;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BannerBlockEntityRenderer;
-import net.minecraft.client.render.entity.AbstractBoatEntityRenderer;
-import net.minecraft.client.render.entity.state.BoatEntityRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.DyeColor;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BannerRenderer;
+import net.minecraft.client.renderer.entity.AbstractBoatRenderer;
+import net.minecraft.client.renderer.entity.state.BoatRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.RotationAxis;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,10 +29,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-@Mixin(AbstractBoatEntityRenderer.class)
+@Mixin(AbstractBoatRenderer.class)
 public class AbstractBoatEntityRendererMixin {
     @Unique
-    private static final Supplier<Map<Item, DyeColor>> BANNER_COLORS = Suppliers.memoize(
+    private static final Supplier<@NotNull Map<Item, DyeColor>> BANNER_COLORS = Suppliers.memoize(
             () -> Util.make(new HashMap<>(), map -> {
                 map.put(Items.WHITE_BANNER, DyeColor.WHITE);
                 map.put(Items.ORANGE_BANNER, DyeColor.ORANGE);
@@ -51,22 +53,23 @@ public class AbstractBoatEntityRendererMixin {
             }));
 
     @Unique
-    private static final Supplier<BannerBlockEntityRenderer> BANNER_BLOCK_ENTITY_RENDERER = Suppliers.memoize(
-            () -> new BannerBlockEntityRenderer(
-                    MinecraftClient.getInstance().getLoadedEntityModels()
+    private static final Supplier<@NotNull BannerRenderer> BANNER_BLOCK_ENTITY_RENDERER = Suppliers.memoize(
+            () -> new BannerRenderer(
+                    Minecraft.getInstance().getEntityModels(),
+                    Minecraft.getInstance().getAtlasManager()
             )
     );
 
     @Inject(
-            method = "updateRenderState(Lnet/minecraft/entity/vehicle/AbstractBoatEntity;Lnet/minecraft/client/render/entity/state/BoatEntityRenderState;F)V",
+            method = "extractRenderState(Lnet/minecraft/world/entity/vehicle/boat/AbstractBoat;Lnet/minecraft/client/renderer/entity/state/BoatRenderState;F)V",
             at = @At("TAIL")
     )
-    private void onUpdateRenderState(AbstractBoatEntity abstractBoatEntity, BoatEntityRenderState boatEntityRenderState, float f, CallbackInfo ci) {
+    private void onUpdateRenderState(AbstractBoat abstractBoatEntity, BoatRenderState boatEntityRenderState, float f, CallbackInfo ci) {
         if (boatEntityRenderState instanceof BoatEntityRenderStateDuck duck) {
             var stack = ModAttachments.getBanner(abstractBoatEntity);
             stack.ifPresentOrElse(stack1 -> {
                 duck.bannerBoats$setBannerColor(BANNER_COLORS.get().getOrDefault(stack1.getItem(), DyeColor.WHITE));
-                duck.bannerBoats$setPatterns(stack1.get(DataComponentTypes.BANNER_PATTERNS));
+                duck.bannerBoats$setPatterns(stack1.get(DataComponents.BANNER_PATTERNS));
             }, () -> {
                 duck.bannerBoats$setBannerColor(null);
                 duck.bannerBoats$setPatterns(null);
@@ -76,29 +79,30 @@ public class AbstractBoatEntityRendererMixin {
     }
 
     @Inject(
-            method = "render(Lnet/minecraft/client/render/entity/state/BoatEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            method = "submit(Lnet/minecraft/client/renderer/entity/state/BoatRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/entity/model/EntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V",
+                    target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V",
                     shift = At.Shift.AFTER
             )
     )
-    private void onRenderBoat(BoatEntityRenderState boatEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        if (!(boatEntityRenderState instanceof BoatEntityRenderStateDuck duck))
+    private void onRenderBoat(BoatRenderState boatRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
+        if (!(boatRenderState instanceof BoatEntityRenderStateDuck duck))
             return;
         if (duck.bannerBoats$patterns() == null || duck.bannerBoats$bannerColor() == null)
             return;
-        matrixStack.push();
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180f).mul(RotationAxis.POSITIVE_Y.rotationDegrees(90f)));
-        matrixStack.translate(-0.5F, 0.15F, -1.45F);
-        BANNER_BLOCK_ENTITY_RENDERER.get().renderAsItem(
-                matrixStack,
-                vertexConsumerProvider,
-                i,
-                OverlayTexture.DEFAULT_UV,
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.XP.rotationDegrees(180f).mul(Axis.YP.rotationDegrees(90f)));
+        poseStack.translate(-0.5F, 0.15F, -1.45F);
+        BANNER_BLOCK_ENTITY_RENDERER.get().submitSpecial(
+                poseStack,
+                submitNodeCollector,
+                boatRenderState.lightCoords,
+                OverlayTexture.NO_OVERLAY,
                 duck.bannerBoats$bannerColor(),
-                duck.bannerBoats$patterns()
+                duck.bannerBoats$patterns(),
+                boatRenderState.outlineColor
         );
-        matrixStack.pop();
+        poseStack.popPose();
     }
 }

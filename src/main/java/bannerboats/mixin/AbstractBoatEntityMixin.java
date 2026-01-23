@@ -2,37 +2,37 @@ package bannerboats.mixin;
 
 import bannerboats.attachment.ModAttachments;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.vehicle.AbstractBoatEntity;
-import net.minecraft.entity.vehicle.VehicleEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
-@Mixin(AbstractBoatEntity.class)
+@Mixin(AbstractBoat.class)
 public abstract class AbstractBoatEntityMixin extends VehicleEntityMixin {
 	@Unique
 	private static final ThreadLocal<ItemStack> BANNER = ThreadLocal.withInitial(() -> null);
 
-	public AbstractBoatEntityMixin(EntityType<?> type, World world) {
+	public AbstractBoatEntityMixin(EntityType<?> type, Level world) {
 		super(type, world);
 	}
 
 	@Override
-	protected void afterDropSelf(ServerWorld world, Item item, CallbackInfo ci) {
+	protected void afterDropSelf(ServerLevel world, Item item, CallbackInfo ci) {
 		super.afterDropSelf(world, item, ci);
 		var stack = BANNER.get();
 		if (stack != null)
-			dropStack(world, stack);
+			spawnAtLocation(world, stack);
 	}
 
 	@Override
-	protected void wrapDropSelf(VehicleEntity instance, ServerWorld world, Item item, Operation<Void> original) {
+	protected void wrapDropSelf(VehicleEntity instance, ServerLevel world, Item item, Operation<Void> original) {
 		var o = BANNER.get();
 		try {
 			ModAttachments.getBanner(instance).ifPresent(BANNER::set);
